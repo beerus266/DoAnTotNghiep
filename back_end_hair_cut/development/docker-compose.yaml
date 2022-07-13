@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  doan-mysql:
+    image: mysql:5.7
+    ports:
+      - "33066:3306"
+    volumes:
+      - ./mysql/.data:/var/lib/mysql
+    networks:
+        appNetwork:
+            ipv4_address: 172.24.2.1
+    environment:
+      MYSQL_DATABASE: do_an_tot_nghiep
+      MYSQL_USER: root1
+      MYSQL_PASSWORD: 1q2345678
+      MYSQL_ROOT_PASSWORD: 1q2345678
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    container_name: walkman
+  dev:
+    container_name: walkman_api
+    image: nestjs-api-dev:1.0.0
+    build:
+        context: .
+        target: development
+        dockerfile: ../Dockerfile
+    command: npm run start:debug
+    ports:
+        - 3001:3001
+    networks:
+        appNetwork:
+            ipv4_address: 172.24.2.2
+    volumes:
+        - ../.:/usr/src/app
+        # - /usr/src/app/node_modules
+    depends_on: 
+        - 'doan-mysql'
+    restart: unless-stopped
+
+networks:
+    appNetwork:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: "172.24.2.0/16"
