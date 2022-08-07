@@ -61,6 +61,15 @@ export const createCookie = (name, value, days) => {
 
 export const getCookie = (name) => {
     console.log(document.cookie);
+
+    const cookies = document.cookie.split(';');
+    const cookie = cookies.filter(c => {
+        if (c.includes(name)) return c;
+    });
+
+    if (cookie.length) return cookie[0].replace(`${name}=`, '');
+
+    return '';
 }
 
 export const makeRandomKey = (length = 16) => {
@@ -121,3 +130,20 @@ export const formatPhoneNumber = (phoneNumber) => {
 
     return _phoneNumber.join('');
 }
+
+export const totalAmount = (order) => {
+    let total = 0;
+    if (order.serviceOrder?.length) {
+        for (const serviceOrder of order.serviceOrder) {
+            total += parseInt(serviceOrder.service.price);
+        }
+    }
+    
+    return total;
+}
+
+export const isNumeric = (str) => {
+    if (typeof str != "string") return false 
+    return !isNaN(str) && 
+           !isNaN(parseFloat(str));
+  }

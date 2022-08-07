@@ -20,14 +20,6 @@ export class User {
     @Column({ default: 'owner'})
     role: string;
 
-    @Column({ default: 18})
-    age: number;
-
-    @Column({
-        default: ''
-    })
-    gender: string;
-
     @Column({
         name: 'email_address',
         nullable: false,

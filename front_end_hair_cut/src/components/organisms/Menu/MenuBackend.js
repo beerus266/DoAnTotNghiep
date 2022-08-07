@@ -24,7 +24,7 @@ const Menu = ({hideMenu}) => {
         order: '/backend/order',
         user: '/backend/user',
     }
-    const commonClass = 'p-7 border-b border-gray-neutrals cursor-pointer hover:text-text-contrast';
+    const commonClass = 'p-7 border-b border-gray-neutrals cursor-pointer hover:bg-gray-n300';
     const [activeTab, setActiveTab] = useState('');
     const account = useSelector(selectorAccount);
 
@@ -49,7 +49,7 @@ const Menu = ({hideMenu}) => {
                     className={cn(
                         commonClass,
                         {
-                            'text-orange-honey': activeTab == linkTab.dashboard
+                            'text-orange-honey ': activeTab == linkTab.dashboard
                         }
                     )}
                     style={{height: '100px'}}

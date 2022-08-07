@@ -1,4 +1,4 @@
-import { ForbiddenException, HttpException, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, HttpException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Service } from "../service/entities/service.entity";
@@ -60,7 +60,7 @@ export class StoreService {
 
         if (id) {
             if (existSlug && id !== existSlug.id) {
-                throw new ForbiddenException('Slug is exist already');
+                throw new BadRequestException('Slug is exist already');
             } else {
                 store = await this.storesRepository.findOneBy({id: id});
                 store.name = name;
@@ -72,7 +72,7 @@ export class StoreService {
             }
         } else {
             if (existSlug) {
-                throw new ForbiddenException('Slug is exist already');
+                throw new BadRequestException('Slug is exist already'); 
             } else {
                 store = this.storesRepository.create({
                     host_id: {id: userId},
@@ -100,7 +100,7 @@ export class StoreService {
             store.status = 0;
             return await this.storesRepository.save(store);
         } else {
-            throw new HttpException('Not found Store', 401);
+            throw new HttpException('Not found Store', 404);
         }
     }
 
@@ -135,7 +135,6 @@ export class StoreService {
         const store = await this.findStoreById(id);
 
         if (store) {
-            console.log(12);
             return this.servicesRepository.find({
                 where:{
                     store_id: {id}

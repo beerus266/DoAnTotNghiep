@@ -74,4 +74,12 @@ export class OrderController {
             throw new ForbiddenException();
         }
     }
+
+    @Get('getAllOrder')
+    async getAllOrder(
+        @Body('storeIds') storeIds: any,
+    ) {
+        return this.orderService.findAll(storeIds);
+    }
+
 }

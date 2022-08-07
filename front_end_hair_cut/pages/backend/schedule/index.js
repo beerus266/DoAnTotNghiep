@@ -201,8 +201,8 @@ const Schedule = ({initSchedules = [], stores}) => {
                         <div 
                             key={store.id}
                             className={cn(
-                                " w-60 border-r-2 border-r-orange-honey h-8 flex justify-center items-center cursor-pointer", 
-                                store.id == currentStoreId ? "bg-white border-t-4 border-t-orange-honey" : "bg-gray-n400"
+                                "px-5 border-r-2 border-r-orange-honey h-8 flex justify-center items-center cursor-pointer text-gray-cm", 
+                                store.id == currentStoreId ? "bg-white border-t-4 border-t-orange-honey text-black" : "bg-gray-n400"
                             )}
                             onClick={() => changeStore(store.id)}
                         >
@@ -226,7 +226,7 @@ const Schedule = ({initSchedules = [], stores}) => {
                         {schedules.map((schedule, i) => 
                         <tr className="border-t-2 border-t-gray-light hover:bg-gray-n300 relative" data-key={`${schedule.id}_${schedule.index}`} key={schedule.id}>
                             <td className="text-left py-4 px-2 w-1/12">{i + 1}</td>
-                            <td className="text-center py-4 px-2 w-1/5">
+                            <td className="text-center py-4 px-2 w-1/6">
                                 <select 
                                     className="w-full h-9 border rounded-lg p-2 border-gray-n500" 
                                     onChange={(e) => changeTypeOfSchedule(e)}
@@ -257,7 +257,6 @@ const Schedule = ({initSchedules = [], stores}) => {
                                     <Input
                                         className='text-center'
                                         disabled={true} 
-                                        // value={schedule.time}
                                         defaultValue={schedule.time} 
                                     />
                                 </td>
@@ -294,7 +293,9 @@ Schedule.getLayout = (page) => <LayoutBackend children={page} />
 export async function getServerSideProps(context) {
 
     const stores = await axios.get(`store/getStoreTab`, {
-        userId: context.req.cookies.userId
+        data: {
+            userId: context.req.cookies.userId
+        }
     }).then((res) => {
         return res.data;
     }).catch((res) => {

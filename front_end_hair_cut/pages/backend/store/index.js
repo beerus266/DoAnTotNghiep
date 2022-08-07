@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ConfirmModal from "components/atoms/ConfirmModal";
 import { toast } from "react-toastify";
 
-import { makeRandomKey, removeVietnameseTones } from "utils/helpers";
+import { getCookie, makeRandomKey, removeVietnameseTones } from "utils/helpers";
 import { loadStores } from "stores/store/store.slice";
 import { selectorStores } from "stores/store/store.selector";
 import { selectorAccount } from "stores/account/account.selector";
@@ -203,8 +203,8 @@ const PostForm = ({setIsOpenPostForm, editStore = {} }) => {
     }
 
     const submit = () => {
-        axios.post('/store/create', {
-            userId: user.id,
+        axios.post('store/create', {
+            userId: getCookie('userId'),
             id : isEditStore ? editStore.id : 0,
             name,
             slug,

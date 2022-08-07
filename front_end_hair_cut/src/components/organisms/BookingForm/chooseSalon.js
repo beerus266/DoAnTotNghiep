@@ -44,7 +44,10 @@ const ChooseSalon = ({setSalonInfor, setIsOpenChooseSalon}) => {
                         <img src={salon.image_url}/>
                     </div>
                     <div className="pl-4 basis-2/3">
-                        <div className="font-semibold text-lg mb-2">
+                        <div className="font-semibold text-lg mb-2 text-orange-honey border-b">
+                            {salon.name}
+                        </div>
+                        <div className="font-semibold text-base mb-2">
                             {salon.address}
                         </div>
                         <div className="font-thin text-xs">
@@ -58,9 +61,6 @@ const ChooseSalon = ({setSalonInfor, setIsOpenChooseSalon}) => {
 }
 
 const SearchInput = ({register, label, setSearchKey}) => {
-
-
-
     return (
         <form className="w-full">
             <div className='relative w-full'>

@@ -90,12 +90,22 @@ export class OrderService {
                 { store_id: {id: store_id}, time: Like(`%${searchKey}%`) },
                 { store_id: {id: store_id}, status: Like(`%${searchKey}%`) },
             ],
+            relations: ['serviceOrder'],
             order: {
                 date: 'DESC'
             }
         });
 
         return orders;
+    }
+
+    async findAll(storeIds) {
+        return await this.ordersRepository.find({
+            where: {
+                store_id: {id: In(storeIds)}
+            },
+            relations: ['serviceOrder'],
+        });
     }
 
 }

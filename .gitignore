@@ -41,6 +41,7 @@ yarn-error.log*
 
 ####
 /back_end_hair_cut/.dev.env
+/back_end_hair_cut/uploads
 
 
 #docker

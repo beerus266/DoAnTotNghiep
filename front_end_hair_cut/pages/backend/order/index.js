@@ -12,13 +12,15 @@ import { ImCancelCircle } from 'react-icons/im';
 import { toast } from "react-toastify";
 import { BsCheckCircle, BsSearch } from "react-icons/bs";
 import Input from "components/atoms/Input/InputBackend";
-import { formatPhoneNumber } from "utils/helpers";
+import { formatPhoneNumber, totalAmount } from "utils/helpers";
+import moment from "moment";
 
 const Order = ({initOrders, stores}) => {
 
     const [currentStoreId, setCurrentStoreId] = useState(stores[0]?.id);
     const [orders, setOrders] = useState(initOrders);
     const textTdClass = 'text-center py-4 px-2';
+    const now = moment().format('YYYY-MM-DD hh:mm');
 
     const variantBadge = (status) => {
         let variant = '';
@@ -40,6 +42,17 @@ const Order = ({initOrders, stores}) => {
         return variant;
     }
 
+    const checkOrderOutOfDate = (order) => {
+        const times = order.time.split('h');
+        const time = `${times[0]}:${times[1] !== '' ? times[1] : '00'}`;
+        const formattedDate = moment(`${order.date} ${time}`, 'YYYY-MM-DD hh:mm');
+        if (formattedDate.isBefore(moment(now,'YYYY-MM-DD hh:mm'))) {
+            return true;
+        }
+
+        return false;
+    }
+
     const changeTextSearch = (e) => {
         if (e.key == "Enter") {
             searchOrder(e.target.value);
@@ -51,6 +64,7 @@ const Order = ({initOrders, stores}) => {
             searchKey,
             storeId: currentStoreId
         }).then((res) => {
+            console.log(res.data);
             setOrders(res.data);
         }).catch(() => {});
     }
@@ -65,15 +79,6 @@ const Order = ({initOrders, stores}) => {
         });
         setCurrentStoreId(storeId);
         setOrders(_orders || []);
-    }
-
-    const total = (serviceOrders) => {
-        let total = 0;
-        for (const serviceOrder of serviceOrders) {
-            total += parseInt(serviceOrder.service.price);
-        }
-
-        return total;
     }
 
     const changeOrderStatus = (orderId, status) => {
@@ -128,8 +133,8 @@ const Order = ({initOrders, stores}) => {
                     {stores.map((store) => 
                         <div 
                             className={cn(
-                                " w-60 border-r-2 border-r-orange-honey h-8 flex justify-center items-center cursor-pointer", 
-                                store.id == currentStoreId ? "bg-white border-t-4 border-t-orange-honey" : "bg-gray-n400"
+                                "px-5 border-r-2 border-r-orange-honey h-8 flex justify-center items-center cursor-pointer text-gray-cm", 
+                                store.id == currentStoreId ? "bg-white border-t-4 border-t-orange-honey text-black" : "bg-gray-n400"
                             )}
                             onClick={() => changeStore(store.id)}
                         >
@@ -198,26 +203,39 @@ const Order = ({initOrders, stores}) => {
                                     className={cn(textTdClass)}
                                 >
                                     {order.serviceOrder &&
-                                        total(order.serviceOrder)
-                                    }
-                                </td>
-                                <td 
-                                    className={cn(
-                                        textTdClass,
-                                        'flex justify-center'
-                                    )}
-                                >
-                                    {order.status == 'Booked' &&
-                                        <IoIosCut onClick={() => changeOrderStatus(order.id, 'Process')} className="border rounded-full w-8 h-8 p-1 text-orange-honey hover:text-orange-y500 cursor-pointer mr-2"/>
-                                    }
-                                    {order.status == 'Process' &&
-                                        <BsCheckCircle onClick={() => changeOrderStatus(order.id, 'Done')} className="w-8 h-8 cursor-pointer mr-2 text-text-green hover:text-green-g500" />
-                                    }
-                                    {(order.status == 'Booked' || order.status == 'Process') &&
-                                        <ImCancelCircle onClick={() => changeOrderStatus(order.id, 'Cancel')} className="w-8 h-8 text-red-dark hover:text-red-neutral cursor-pointer"/>
+                                        totalAmount(order)
                                     }
                                 </td>
                                 
+                                {!checkOrderOutOfDate(order) && 
+                                    <td 
+                                        className={cn(
+                                            textTdClass,
+                                            'flex justify-center'
+                                        )}
+                                    >
+                                        <IoIosCut
+                                                onClick={() => changeOrderStatus(order.id, 'Process')} 
+                                                className={cn(
+                                                "border rounded-full w-8 h-8 p-1  mr-2",
+                                                order.status == 'Booked' ? 'text-orange-honey hover:text-orange-y500 cursor-pointer' : 'pointer-events-none text-gray-n600'
+                                            )}
+                                        />
+                                        <BsCheckCircle 
+                                            onClick={() => changeOrderStatus(order.id, 'Done')} 
+                                            className={cn(
+                                                "w-8 h-8  mr-2",
+                                                order.status == 'Process' ? ' text-text-green hover:text-green-g500 cursor-pointer' : 'pointer-events-none text-gray-n600'
+                                            )}
+                                        />
+                                        <ImCancelCircle 
+                                            onClick={() => changeOrderStatus(order.id, 'Cancel')} 
+                                            className={cn(
+                                                "w-8 h-8 ",
+                                                order.status == 'Booked' || order.status == 'Process' ? ' text-red-dark hover:text-red-neutral cursor-pointer' : 'pointer-events-none text-gray-n600'
+                                            )}
+                                        />
+                                    </td>}
                             </tr>)}
                         </tbody>
                     </table>
@@ -232,7 +250,9 @@ Order.getLayout = (page) => <LayoutBackend children={page} />
 export const getServerSideProps = async (context) => {
 
     const stores = await axios.get(`store/getStoreTab`, {
-        userId: context.req.cookies.userId
+        data: {
+            userId: context.req.cookies.userId
+        }
     }).then((res) => {
         return res.data;
     }).catch((res) => {

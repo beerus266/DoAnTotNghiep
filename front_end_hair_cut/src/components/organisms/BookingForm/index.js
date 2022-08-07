@@ -8,6 +8,7 @@ import Success from './success';
 import { axios } from 'utils/axios';
 import { useRouter } from 'next/router';
 import { renderShiftToRange } from 'utils/helpers';
+import { toast } from 'react-toastify';
 
 const BookingForm = () => {
 
@@ -32,8 +33,18 @@ const BookingForm = () => {
     }
 
     const chooseService = () => {
-        setIsOpenChooseService(true);
-        setTitle('Choose the service');
+        if (Object.keys(salonInfor).length) {
+            setIsOpenChooseService(true);
+            setTitle('Choose the service');
+        } else {
+            toast.info('Please choose the salon first!', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: true,
+                pauseOnHover: true,
+                theme: 'dark'
+            });
+        }
     }
 
     const backBooking = () => {
@@ -119,6 +130,7 @@ const BookingForm = () => {
         if (salonInfor.id) {
             getSchedule();
         }
+        setServices([]);
 
     }, [salonInfor]);
 

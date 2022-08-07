@@ -9,20 +9,19 @@ const Header = ({}) => {
         <div
             className='shadow-md l:relative top-0 w-full z-50 bg-white'
         >
-            <div className='px-4 bg-white pb-2 l:pb-5 mx-auto l:p-0 l:pt-5 l:max-w-60 xl:max-w-screen-xl'>
-                <div className='pt-3 flex z-10 relative bg-white gap-4'>
-                    <div className="flex items-center w-1/5 relative">
-                        <Link href="/">
-                            <a className="cursor-pointer absolute transform ">
-                                <img
-                                    width={120}
-                                    height={37}
-                                    src='https://9prints-bucket-data-sync-efs.s3.us-east-2.amazonaws.com/52/storage/setting/413.BOH1H627dd70fdd02d.png'
-                                    className='h-auto w-auto max-h-10'
-                                />
-                            </a>
-                        </Link>
-                    </div>
+            <div className='px-4 bg-white pb-2 l:pb-5 mx-auto l:p-0 l:pt-5 h-24'>
+                <div className='pt-3 flex z-10 relative bg-white gap-4 justify-center items-center'>
+                    <Link href="/">
+                        <a className="cursor-pointer absolute transform ">
+                            <img
+                                width={100}
+                                height={100}
+                                // src='https://9prints-bucket-data-sync-efs.s3.us-east-2.amazonaws.com/52/storage/setting/413.BOH1H627dd70fdd02d.png'
+                                src='/logo.png'
+                                className=''
+                            />
+                        </a>
+                    </Link>
                     <div className="flex items-center w-2/5 relative">
                         {/* <SearchInput /> */}
                     </div>
@@ -43,7 +42,7 @@ const Header = ({}) => {
                 </div>
             </div>
             <div className="mx-auto xl:max-w-screen-xl">
-                <Menu />
+                {/* <Menu /> */}
             </div>
         </div>
     );

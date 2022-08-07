@@ -15,10 +15,11 @@ import Switch from 'react-switch';
 import { axios } from "utils/axios";
 import { useDispatch, useSelector } from "react-redux";
 import { selectorAccount } from "stores/account/account.selector";
-import { makeRandomKey } from "utils/helpers";
+import { isNumeric, makeRandomKey } from "utils/helpers";
 import ConfirmModal from "components/atoms/ConfirmModal";
 import { loadServices } from "stores/service/service.slice";
 import { selectorServices } from "stores/service/service.selector";
+import Badge from "components/atoms/Badge";
 
 const Service = ({initServices = [], stores}) => {
 
@@ -106,8 +107,8 @@ const Service = ({initServices = [], stores}) => {
                             {stores.map((store) => 
                                 <div 
                                     className={cn(
-                                        " w-60 border-r-2 border-r-orange-honey h-8 flex justify-center items-center cursor-pointer", 
-                                        store.id == currentStoreId ? "bg-white border-t-4 border-t-orange-honey" : "bg-gray-n400"
+                                        "border-r-2 border-r-orange-honey h-8 flex justify-center items-center cursor-pointer px-5 text-gray-cm", 
+                                        store.id == currentStoreId ? "bg-white border-t-4 border-t-orange-honey text-black" : "bg-gray-n400"
                                     )}
                                     onClick={() => changeStore(store.id)}
                                 >
@@ -133,11 +134,18 @@ const Service = ({initServices = [], stores}) => {
                                 <div className="basis-2/12 p-5 border-x border-gray-n400 flex flex-col justify-between">
                                     <div>   
                                         <h5 className="uppercase text-right font-semibold">Price</h5>
-                                        <p className="text-right">{service.price} K</p>
+                                        <p className="text-right">{service.price} VND</p>
                                     </div>
-                                    <div>
+                                    {/* <div>
                                         <h5 className="uppercase text-right font-semibold">date created</h5>
                                         <p className="text-right">December 15, 2019</p>
+                                    </div> */}
+                                    <div>
+                                        <Badge 
+                                            className='float-right'
+                                            text={service.isMainService ? 'Main service' : 'Option service'}
+                                            variant={service.isMainService ? 'green' : 'yellow'}
+                                        />
                                     </div>
                                 </div>
                                 <div className="flex flex-col p-5 justify-center items-center">
@@ -176,7 +184,7 @@ const PostForm = ({setIsOpenPostForm, editService, storeId}) => {
     const [name, setName] = useState(editService?.name || '');
     const [price, setPrice] = useState(editService?.price || '');
     const [description, setDescription] = useState(editService?.description || '');
-    const [isMainService, setIsMainService] = useState(editService ? editService?.isMainService : true);
+    const [isMainService, setIsMainService] = useState(editService ? editService?.isMainService : false);
     const [fileImage, setFileImage] = useState(editService?.image_url || '/placeholder.jpg');
     const services = useSelector(selectorServices);
 
@@ -202,9 +210,24 @@ const PostForm = ({setIsOpenPostForm, editService, storeId}) => {
         }
     }
 
-    useEffect(() => {}, [])
+    const validateForm = () => {
+        if (!isNumeric(price)) return false;
+
+        return true;
+    }
 
     const submit = () => {
+
+        if (!validateForm()) {
+            toast.error('Validated information is wrong!', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: true,
+                pauseOnHover: true,
+                theme: 'dark'
+            });
+            return;
+        }
         axios.post('service/create', {
             storeId,
             id : isEditService ? editService.id : 0,
@@ -233,6 +256,7 @@ const PostForm = ({setIsOpenPostForm, editService, storeId}) => {
                 autoClose: 5000,
                 hideProgressBar: true,
                 pauseOnHover: true,
+                theme: 'dark'
             });
             setIsOpenPostForm(false);
         }).catch((res) => {
@@ -251,16 +275,16 @@ const PostForm = ({setIsOpenPostForm, editService, storeId}) => {
                     </div>
                     <div className="mb-5 w-full">
                         <label className="mb-2 block font-semibold">Description</label>
-                        <Input placeholder='Enter the address' defaultValue={editService?.description || ''} onChange={e => setDescription(e.target.value)}/>
+                        <Input placeholder='Enter the description' defaultValue={editService?.description || ''} onChange={e => setDescription(e.target.value)}/>
                     </div>
                     <div className="mb-5 w-full">
                         <label className="mb-2 block font-semibold">Price</label>
-                        <Input placeholder='Enter the address' defaultValue={editService?.price || ''} onKeyPress={onChangePrice}/>
+                        <Input placeholder='Enter the price' defaultValue={editService?.price || ''} onChange={e => setPrice(e.target.value)}/>
                     </div>
                     <div className="mb-5 w-full">
-                        <div className="mb-2 font-semibold">
-                            <label className="mb-3">Main service</label>
-                            <Switch checked={isMainService} onChange={(e) => setIsMainService(e)}/>
+                        <div className="mb-2 font-semibold flex justify-start items-center">
+                            <label className="h-full inline-block">Main service</label>
+                            <Switch className="ml-5" checked={isMainService} onChange={(e) => setIsMainService(e)}/>
                         </div>
                     </div>
                 </div>
@@ -292,7 +316,9 @@ const PostForm = ({setIsOpenPostForm, editService, storeId}) => {
 export const getServerSideProps = async (ctx) => {
 
     const stores = await axios.get(`store/getStoreTab`, {
-        userId: ctx.req.cookies.userId
+        data: {
+            userId: ctx.req.cookies.userId
+        }
     }).then((res) => {
         return res.data;
     }).catch((res) => {

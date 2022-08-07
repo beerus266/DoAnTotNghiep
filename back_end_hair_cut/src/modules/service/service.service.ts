@@ -39,6 +39,9 @@ export class ServicesService {
             where: {
                 store_id: {id: storeId},
                 status: 1
+            },
+            order: {
+                createAt: 'DESC'
             }
         });
     }
