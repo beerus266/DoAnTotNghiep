@@ -12,8 +12,8 @@ import { MailService } from './mail.service';
         secure: false,
         port: 587,
         auth: {
-          user: 'haircuthainv@gmail.com',
-          pass: 'ctnxsyojdhdntdjo',
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PASSWORD,
         },
       },
       defaults: {
